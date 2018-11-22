@@ -19,30 +19,33 @@ class Roulette extends Component {
       onMoveShouldSetResponderCapture: () => true,
       onMoveShouldSetPanResponderCapture: () => true,
       onPanResponderRelease: () => {
-        const { enableUserRotate, onRotate, onRotateChange, duration, easing } = this.props;
+        const { enableUserRotate } = this.props;
 
-        if (enableUserRotate) {
-          const { options, turns } = this.props;
-          const { activeItem } = this.state;
-          let random = Math.floor(Math.random() * options.length) 
-          + (options.length*turns);                    
-          const nextItem = random;
-
-          this.state._animatedValue.setValue(activeItem);
-          let animation = Animated.timing(this.state._animatedValue, { toValue: nextItem, easing, duration })          
-          onRotateChange("start");
-          animation.start(()=>{
-            onRotateChange("stop");
-          });
-          
-          let newActiveItem = nextItem > options.length ? (nextItem % options.length)  : nextItem;
-          if(newActiveItem == 0){
-            newActiveItem = options.length
-          }
-          this.setState({ activeItem: newActiveItem }, () => onRotate(options[options.length - newActiveItem]));
-        }
+        if (enableUserRotate) this.triggerSpin();
       }
     });
+  }
+
+  triggerSpin(spinToIndex) {
+    const { options, turns, onRotate, onRotateChange, duration, easing } = this.props;
+    const { activeItem } = this.state;
+    const randomSelected = Math.floor(Math.random() * options.length);
+    const selectedIndex = spinToIndex != null ? spinToIndex : randomSelected;
+    const turnsMultiplier = options.length * turns;
+    const nextItem = selectedIndex + turnsMultiplier;
+
+    this.state._animatedValue.setValue(activeItem);
+    let animation = Animated.timing(this.state._animatedValue, { toValue: nextItem, easing, duration })
+    onRotateChange("start");
+    animation.start(()=>{
+      onRotateChange("stop");
+    });
+
+    let newActiveItem = nextItem > options.length ? (nextItem % options.length)  : nextItem;
+    if(newActiveItem == 0){
+      newActiveItem = options.length
+    }
+    this.setState({ activeItem: newActiveItem }, () => onRotate(options[options.length - newActiveItem]));
   }
 
   render() {
@@ -57,7 +60,7 @@ class Roulette extends Component {
 
     return (
       <View>
-        
+
         <Animated.View
           {...this.panResponder.panHandlers}
           style={[
@@ -79,10 +82,10 @@ class Roulette extends Component {
               />
           )}
           </ImageBackground>
-          
+
         </Animated.View>
         <Image source={marker} resizeMode="contain" style={[styles.marker,{zIndex:9999,top: markerTop, width:markerWidth, left: (radius/2) -(markerWidth/2)}, markerStyle ]}/>
-        
+
         {centerImage &&
           <Image source={centerImage} resizeMode="contain" style={[styles.marker,{zIndex:9999,top: centerTop, width:centerWidth, left: (radius/2) -(centerWidth/2) },centerStyle ]}/>
         }
@@ -98,7 +101,7 @@ Roulette.propTypes = {
   rouletteRotate: PropTypes.number,
   enableUserRotate: PropTypes.bool,
   onRotate: PropTypes.func,
-  onRotateChange: PropTypes.func,  
+  onRotateChange: PropTypes.func,
   rotateEachElement: PropTypes.func,
   customStyle: PropTypes.any,
   background: PropTypes.any,
