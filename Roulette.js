@@ -49,7 +49,7 @@ class Roulette extends Component {
   }
 
   render() {
-    const { options, radius, distance, customStyle, rouletteRotate, background, marker,centerImage, markerWidth,markerTop,centerWidth,centerTop,markerStyle, centerStyle, rotateEachElement } = this.props;
+    const { options, radius, distance, padding, customStyle, rouletteRotate, background, marker,centerImage, markerWidth,markerTop,centerWidth,centerTop,markerStyle, centerStyle, rotateEachElement } = this.props;
 
     const interpolatedRotateAnimation = this.state._animatedValue.interpolate({
       inputRange: [0, options.length],
@@ -57,7 +57,6 @@ class Roulette extends Component {
     });
 
     const displayOptions = options && options.length > 0 && options[0] && React.isValidElement(options[0]);
-
     return (
       <View>
 
@@ -70,12 +69,12 @@ class Roulette extends Component {
             customStyle
           ]}
         >
-          <ImageBackground width={radius} height={radius} style={{width:radius, height: radius, zIndex:100}} source={background}>
+          <ImageBackground width={radius-padding} height={radius-padding} style={{width:radius-padding, height: radius-padding, zIndex:100}} source={background}>
           {displayOptions && Children.map(options, (child, index) =>
               <RouletteItem
                 item={child}
                 index={index}
-                radius={radius}
+                radius={radius-padding}
                 step={this.step}
                 distance={distance}
                 rouletteRotate={ rotateEachElement(index) }
@@ -117,6 +116,7 @@ Roulette.defaultProps = {
   enableUserRotate: false,
   background: null,
   turns: 4,
+  padding: 45,
   rotateEachElement: (index) => 0,
   onRotate: () => {},
   onRotateChange: () => {},
